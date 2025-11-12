@@ -1,0 +1,30 @@
+import tensorflow as tf
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras import models, layers
+import numpy as np
+
+print("--- Starting MNIST Model Training Script ---")
+print("This process will take a few minutes as it trains the neural network.")
+
+# 1. Load and Preprocess Data
+print("Loading and preprocessing MNIST data...")
+# Load only training data
+(train_images, train_labels), (_, _) = mnist.load_data()
+
+# Reshape (60000, 28, 28) to (60000, 784) and Normalize to [0, 1]
+# This step is critical for the Dense layer input
+train_images = train_images.reshape((60000, 28 * 28)).astype('float32') / 255
+
+# 2. Define, Compile, and Train Model
+network = models.Sequential()
+network.add(layers.Dense(512, activation='relu', input_shape=(784,)))
+network.add(layers.Dense(10, activation='softmax'))
+network.compile(optimizer="rmsprop", loss="sparse_categorical_crossentropy", metrics=["accuracy"])
+
+print("Starting model training (5 epochs)...")
+network.fit(train_images, train_labels, epochs=5, batch_size=128, verbose=1)
+
+# 3. Save the Model
+model_path = 'mnist_model.h5'
+network.save(model_path) 
+print(f"\n--- SUCCESS: Model saved as {model_path} ---")
